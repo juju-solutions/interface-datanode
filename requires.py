@@ -22,24 +22,24 @@ from jujubigdata import utils
 class DataNodeRequires(RelationBase):
     scope = scopes.UNIT
 
-    @hook('{provides:datanode}-relation-joined')
+    @hook('{requires:datanode}-relation-joined')
     def joined(self):
         conv = self.conversation()
         conv.set_state('{relation_name}.related')
 
-    @hook('{provides:datanode}-relation-changed')
+    @hook('{requires:datanode}-relation-changed')
     def changed(self):
         conv = self.conversation()
         registered = conv.get_remote('registered', 'false').lower() == 'true'
         conv.toggle_state('{relation_name}.registered', registered)
 
-    @hook('{provides:datanode}-relation-departed')
+    @hook('{requires:datanode}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.add_state('{relation_name}.departing')
         conv.remove_state('{relation_name}.related')
 
-    @hook('{provides:datanode}-relation-broken')
+    @hook('{requires:datanode}-relation-broken')
     def broken(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')

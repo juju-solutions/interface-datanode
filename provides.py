@@ -42,11 +42,11 @@ class DataNodeProvides(RelationBase):
     def hosts_map(self):
         return json.loads(self.get_remote('hosts-map', '{}'))
 
-    @hook('{requires:datanode}-relation-joined')
+    @hook('{provides:datanode}-relation-joined')
     def joined(self):
         self.set_state('{relation_name}.related')
 
-    @hook('{requires:datanode}-relation-changed')
+    @hook('{provides:datanode}-relation-changed')
     def changed(self):
         hookenv.log('Data: {}'.format({
             'spec': self.spec(),
@@ -68,7 +68,7 @@ class DataNodeProvides(RelationBase):
     def register(self):
         self.set_remote('registered', 'true')
 
-    @hook('{requires:datanode}-relation-{departed,broken}')
+    @hook('{provides:datanode}-relation-{departed,broken}')
     def departed(self):
         self.remove_state('{relation_name}.related')
         self.remove_state('{relation_name}.spec.mismatch')
