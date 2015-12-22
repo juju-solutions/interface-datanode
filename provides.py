@@ -38,11 +38,11 @@ class DataNodeProvides(RelationBase):
 
     def datanode_spec(self):
         conv = self.conversation()
-        return json.loads(conv.get_local('spec', '{}'))
+        return json.loads(conv.get_local('spec', 'null'))
 
     def namenode_spec(self):
         conv = self.conversation()
-        return json.loads(conv.get_remote('spec', '{}'))
+        return json.loads(conv.get_remote('spec', 'null'))
 
     def hosts_map(self):
         conv = self.conversation()
@@ -93,6 +93,8 @@ class DataNodeProvides(RelationBase):
     def _spec_match(self):
         datanode_spec = self.datanode_spec()
         namenode_spec = self.namenode_spec()
+        if None in (datanode_spec, namenode_spec):
+            return False
         for key, value in datanode_spec.items():
             if value != namenode_spec.get(key):
                 return False
