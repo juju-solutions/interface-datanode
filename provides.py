@@ -24,7 +24,7 @@ class DataNodeProvides(RelationBase):
     scope = scopes.GLOBAL
     auto_accessors = ['host', 'port', 'webhdfs-port', 'ssh-key']
 
-    def set_datanode_spec(self, spec):
+    def set_local_spec(self, spec):
         """
         Set the local spec.
 
@@ -36,11 +36,11 @@ class DataNodeProvides(RelationBase):
     def local_hostname(self):
         return hookenv.local_unit().replace('/', '-')
 
-    def datanode_spec(self):
+    def local_spec(self):
         conv = self.conversation()
         return json.loads(conv.get_local('spec', 'null'))
 
-    def namenode_spec(self):
+    def remote_spec(self):
         conv = self.conversation()
         return json.loads(conv.get_remote('spec', 'null'))
 
@@ -56,8 +56,8 @@ class DataNodeProvides(RelationBase):
     @hook('{provides:datanode}-relation-changed')
     def changed(self):
         hookenv.log('Data: {}'.format({
-            'datanode_spec': self.datanode_spec(),
-            'namenode_spec': self.namenode_spec(),
+            'local_spec': self.local_spec(),
+            'remote_spec': self.remote_spec(),
             'host': self.host(),
             'port': self.port(),
             'webhdfs_port': self.webhdfs_port(),
@@ -66,7 +66,7 @@ class DataNodeProvides(RelationBase):
         }))
         conv = self.conversation()
         available = all([
-            self.namenode_spec(),
+            self.remote_spec() is not None,
             self.host(),
             self.port(),
             self.webhdfs_port(),
@@ -91,8 +91,8 @@ class DataNodeProvides(RelationBase):
         conv.remove_state('{relation_name}.ready')
 
     def _spec_match(self):
-        datanode_spec = self.datanode_spec()
-        namenode_spec = self.namenode_spec()
+        datanode_spec = self.local_spec()
+        namenode_spec = self.remote_spec()
         if None in (datanode_spec, namenode_spec):
             return False
         for key, value in datanode_spec.items():
