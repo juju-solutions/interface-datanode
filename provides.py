@@ -22,7 +22,7 @@ from charmhelpers.core import hookenv
 
 class DataNodeProvides(RelationBase):
     scope = scopes.GLOBAL
-    auto_accessors = ['host', 'port', 'webhdfs-port', 'ssh-key']
+    auto_accessors = ['port', 'webhdfs-port', 'ssh-key']
 
     def set_local_spec(self, spec):
         """
@@ -44,7 +44,21 @@ class DataNodeProvides(RelationBase):
         conv = self.conversation()
         return json.loads(conv.get_remote('spec', 'null'))
 
+    def namenodes(self):
+        """
+        Returns a list of the NameNode host names.
+        """
+        conv = self.conversation()
+        return json.loads(conv.get_remote('namenodes', '[]'))
+
     def hosts_map(self):
+        """
+        Return a mapping of IPs to host names suitable for use with
+        `jujubigdata.utils.update_etc_hosts`.
+
+        This will contain the IPs of the NameNode host names, as well as all
+        other DataNode host names, to ensure that they are resolvable.
+        """
         conv = self.conversation()
         return json.loads(conv.get_remote('hosts-map', '{}'))
 
@@ -58,7 +72,7 @@ class DataNodeProvides(RelationBase):
         hookenv.log('Data: {}'.format({
             'local_spec': self.local_spec(),
             'remote_spec': self.remote_spec(),
-            'host': self.host(),
+            'namenodes': self.namenodes(),
             'port': self.port(),
             'webhdfs_port': self.webhdfs_port(),
             'hosts_map': self.hosts_map(),
@@ -67,7 +81,8 @@ class DataNodeProvides(RelationBase):
         conv = self.conversation()
         available = all([
             self.remote_spec() is not None,
-            self.host(),
+            self.hosts_map(),
+            self.namenodes(),
             self.port(),
             self.webhdfs_port(),
             self.ssh_key()])
@@ -83,7 +98,7 @@ class DataNodeProvides(RelationBase):
         conv = self.conversation()
         conv.set_remote('registered', 'true')
 
-    @hook('{provides:datanode}-relation-{departed,broken}')
+    @hook('{provides:datanode}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')
