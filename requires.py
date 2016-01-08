@@ -59,9 +59,9 @@ class DataNodeRequires(RelationBase):
         for conv in self.conversations():
             conv.set_remote('spec', json.dumps(spec))
 
-    def send_host(self, host):
+    def send_namenodes(self, namenodes):
         for conv in self.conversations():
-            conv.set_remote('host', host)
+            conv.set_remote('namenodes', json.dumps(namenodes))
 
     def send_ports(self, port, webhdfs_port):
         for conv in self.conversations():
