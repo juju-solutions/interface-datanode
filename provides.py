@@ -60,14 +60,14 @@ class DataNodeProvides(RelationBase):
         other DataNode host names, to ensure that they are resolvable.
         """
         conv = self.conversation()
-        return json.loads(conv.get_remote('hosts-map', '{}'))
+        return json.loads(conv.get_remote('etc_hosts', '{}'))
 
-    @hook('{provides:datanode}-relation-joined')
+    @hook('{provides:dfs-slave}-relation-joined')
     def joined(self):
         conv = self.conversation()
         conv.set_state('{relation_name}.related')
 
-    @hook('{provides:datanode}-relation-changed')
+    @hook('{provides:dfs-slave}-relation-changed')
     def changed(self):
         hookenv.log('Data: {}'.format({
             'local_spec': self.local_spec(),
@@ -94,11 +94,7 @@ class DataNodeProvides(RelationBase):
 
         hookenv.log('States: {}'.format(set(get_states().keys())))
 
-    def register(self):
-        conv = self.conversation()
-        conv.set_remote('registered', 'true')
-
-    @hook('{provides:datanode}-relation-departed')
+    @hook('{provides:dfs-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')
