@@ -1,4 +1,4 @@
-name: datanode
+name: dfs-slave
 summary: Interface for relating DataNodes to NameNodes
 version: 1
 maintainer: "Big Data Team <bigdata@lists.ubuntu.com>"

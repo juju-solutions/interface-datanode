@@ -22,24 +22,16 @@ from jujubigdata import utils
 class DataNodeRequires(RelationBase):
     scope = scopes.UNIT
 
-    @hook('{requires:datanode}-relation-joined')
+    @hook('{requires:dfs-slave}-relation-joined')
     def joined(self):
         conv = self.conversation()
         conv.set_state('{relation_name}.related')
-        conv.remove_state('{relation_name}.registered')
         conv.remove_state('{relation_name}.departing')
 
-    @hook('{requires:datanode}-relation-changed')
-    def changed(self):
-        conv = self.conversation()
-        registered = conv.get_remote('registered', 'false').lower() == 'true'
-        conv.toggle_state('{relation_name}.registered', registered)
-
-    @hook('{requires:datanode}-relation-departed')
+    @hook('{requires:dfs-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')
-        conv.remove_state('{relation_name}.registered')
         conv.set_state('{relation_name}.departing')
 
     def dismiss(self):
@@ -76,4 +68,4 @@ class DataNodeRequires(RelationBase):
 
     def send_hosts_map(self, hosts_map):
         for conv in self.conversations():
-            conv.set_remote('hosts-map', json.dumps(hosts_map))
+            conv.set_remote('etc_hosts', json.dumps(hosts_map))
