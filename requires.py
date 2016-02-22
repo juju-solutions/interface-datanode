@@ -15,7 +15,6 @@ import json
 from charms.reactive import RelationBase
 from charms.reactive import hook
 from charms.reactive import scopes
-
 from jujubigdata import utils
 
 
@@ -28,10 +27,17 @@ class DataNodeRequires(RelationBase):
         conv.set_state('{relation_name}.joined')
         conv.remove_state('{relation_name}.departing')
 
+    @hook('{requires:dfs-slave}-relation-changed')
+    def changed(self):
+        if self.jn_port():
+            conv = self.conversation()
+            conv.set_state('{relation_name}.journalnode.joined')
+
     @hook('{requires:dfs-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.joined')
+        conv.remove_state('{relation_name}.journalnode.joined')
         conv.set_state('{relation_name}.departing')
 
     def dismiss(self):
@@ -39,18 +45,31 @@ class DataNodeRequires(RelationBase):
             conv.remove_state('{relation_name}.departing')
 
     def nodes(self):
-        return [
-            {
-                'host': conv.scope.replace('/', '-'),
-                'ip': utils.resolve_private_address(
-                    conv.get_remote('private-address', '')),
-            }
-            for conv in self.conversations()
-        ]
+        return [conv.scope.replace('/', '-') for conv in self.conversations()]
+
+    def hosts_map(self):
+        result = {}
+        for conv in self.conversations():
+            host = conv.scope.replace('/', '-')
+            addr = conv.get_remote('private-address', '')
+            ip = utils.resolve_private_address(addr)
+            result.update({ip: host})
+        return result
+
+    def jn_port(self):
+        for conv in self.conversations():
+            port = conv.get_remote('jn_port')
+            if port:
+                return port
+        return None
 
     def send_spec(self, spec):
         for conv in self.conversations():
             conv.set_remote('spec', json.dumps(spec))
+
+    def send_clustername(self, clustername):
+        for conv in self.conversations():
+            conv.set_remote('clustername', clustername)
 
     def send_namenodes(self, namenodes):
         for conv in self.conversations():
