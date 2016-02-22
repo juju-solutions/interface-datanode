@@ -28,6 +28,12 @@ class DataNodeRequires(RelationBase):
         conv.set_state('{relation_name}.joined')
         conv.remove_state('{relation_name}.departing')
 
+    @hook('{requires:dfs-slave}-relation-changed')
+    def changed(self):
+        if self.jn_port():
+            conv = self.conversation()
+            conv.set_state('{relation_name}.journalnode.ha')
+
     @hook('{requires:dfs-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
@@ -48,9 +54,20 @@ class DataNodeRequires(RelationBase):
             for conv in self.conversations()
         ]
 
+    def jn_port(self):
+        for conv in self.conversations():
+            port = conv.get_remote('jn_port')
+            if port:
+                return port
+        return None
+
     def send_spec(self, spec):
         for conv in self.conversations():
             conv.set_remote('spec', json.dumps(spec))
+
+    def send_clustername(self, clustername):
+        for conv in self.conversations():
+            conv.set_remote('clustername', clustername)
 
     def send_namenodes(self, namenodes):
         for conv in self.conversations():
