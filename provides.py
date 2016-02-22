@@ -22,7 +22,7 @@ from charmhelpers.core import hookenv
 
 class DataNodeProvides(RelationBase):
     scope = scopes.GLOBAL
-    auto_accessors = ['port', 'webhdfs-port', 'ssh-key']
+    auto_accessors = ['clustername', 'port', 'webhdfs-port', 'ssh-key']
 
     def set_local_spec(self, spec):
         """
@@ -72,6 +72,7 @@ class DataNodeProvides(RelationBase):
         hookenv.log('Data: {}'.format({
             'local_spec': self.local_spec(),
             'remote_spec': self.remote_spec(),
+            'clustername': self.clustername(),
             'namenodes': self.namenodes(),
             'port': self.port(),
             'webhdfs_port': self.webhdfs_port(),
@@ -82,6 +83,7 @@ class DataNodeProvides(RelationBase):
         available = all([
             self.remote_spec() is not None,
             self.hosts_map(),
+            self.clustername(),
             self.namenodes(),
             self.port(),
             self.webhdfs_port(),
@@ -94,6 +96,9 @@ class DataNodeProvides(RelationBase):
 
         hookenv.log('States: {}'.format(set(get_states().keys())))
 
+    def send_jn_port(self, port):
+        conv = self.conversation()
+        conv.set_remote('jn_port', port)
     @hook('{provides:dfs-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
