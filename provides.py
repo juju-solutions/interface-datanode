@@ -100,6 +100,7 @@ class DataNodeProvides(RelationBase):
     def send_jn_port(self, port):
         conv = self.conversation()
         conv.set_remote('jn_port', port)
+
     @hook('{provides:dfs-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
