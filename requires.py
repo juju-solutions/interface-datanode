@@ -38,6 +38,7 @@ class DataNodeRequires(RelationBase):
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')
+        conv.remove_state('{relation_name}.journalnode.ha')
         conv.set_state('{relation_name}.departing')
 
     def dismiss(self):
