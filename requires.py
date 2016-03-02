@@ -30,7 +30,7 @@ class DataNodeRequires(RelationBase):
 
     @hook('{requires:dfs-slave}-relation-changed')
     def changed(self):
-        if self.jn_port():
+        if len(self.started_journalnodes()) > 3:
             conv = self.conversation()
             conv.set_state('{relation_name}.journalnode.ha')
 
@@ -40,6 +40,9 @@ class DataNodeRequires(RelationBase):
         conv.remove_state('{relation_name}.joined')
         conv.remove_state('{relation_name}.journalnode.ha')
         conv.set_state('{relation_name}.departing')
+
+    def started_journalnodes(self):
+        return [conv.scope for conv in self.conversations() if conv.get_remote('journalnode-started')]
 
     def dismiss(self):
         for conv in self.conversations():
@@ -90,3 +93,7 @@ class DataNodeRequires(RelationBase):
     def send_hosts_map(self, hosts_map):
         for conv in self.conversations():
             conv.set_remote('etc_hosts', json.dumps(hosts_map))
+
+    def set_started(self):
+        for conv in self.conversations():
+            conv.set_remote('datanode_started', True)
