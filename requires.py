@@ -15,7 +15,7 @@ import json
 from charms.reactive import RelationBase
 from charms.reactive import hook
 from charms.reactive import scopes
-
+from charmhelpers.core import hookenv
 from jujubigdata import utils
 
 
@@ -30,9 +30,13 @@ class DataNodeRequires(RelationBase):
 
     @hook('{requires:dfs-slave}-relation-changed')
     def changed(self):
-        if len(self.started_journalnodes()) > 3:
+        msg = str(self.started_journalnodes()) + str(len(self.started_journalnodes()))
+        hookenv.log('JOURNALNODE SET HERE FIRST')
+        hookenv.log(msg)
+        if len(self.started_journalnodes()) > 2:
             conv = self.conversation()
             conv.set_state('{relation_name}.journalnode.ha')
+            hookenv.log('JOURNALNODE STATE SET HERE')
 
     @hook('{requires:dfs-slave}-relation-departed')
     def departed(self):
@@ -93,7 +97,3 @@ class DataNodeRequires(RelationBase):
     def send_hosts_map(self, hosts_map):
         for conv in self.conversations():
             conv.set_remote('etc_hosts', json.dumps(hosts_map))
-
-    def set_started(self):
-        for conv in self.conversations():
-            conv.set_remote('datanode_started', True)

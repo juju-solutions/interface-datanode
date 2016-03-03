@@ -102,6 +102,7 @@ class DataNodeProvides(RelationBase):
         conv.set_remote('jn_port', port)
 
     def node_started(self):
+        hookenv.log('Journalnode hit node_started')
         conv = self.conversation()
         conv.set_remote('journalnode-started', True)
 
