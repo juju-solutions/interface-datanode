@@ -30,13 +30,10 @@ class DataNodeRequires(RelationBase):
 
     @hook('{requires:dfs-slave}-relation-changed')
     def changed(self):
-        msg = str(self.started_journalnodes()) + str(len(self.started_journalnodes()))
-        hookenv.log('JOURNALNODE SET HERE FIRST')
-        hookenv.log(msg)
-        if len(self.started_journalnodes()) > 2:
+        if self.jn_port():
+        #if len(self.started_journalnodes()) > 2:
             conv = self.conversation()
             conv.set_state('{relation_name}.journalnode.ha')
-            hookenv.log('JOURNALNODE STATE SET HERE')
 
     @hook('{requires:dfs-slave}-relation-departed')
     def departed(self):
@@ -44,6 +41,10 @@ class DataNodeRequires(RelationBase):
         conv.remove_state('{relation_name}.joined')
         conv.remove_state('{relation_name}.journalnode.ha')
         conv.set_state('{relation_name}.departing')
+
+    def journalnodes_ready(self):
+        if len(self.started_journalnodes()) > 2:
+            return True 
 
     def started_journalnodes(self):
         return [conv.scope for conv in self.conversations() if conv.get_remote('journalnode-started')]
