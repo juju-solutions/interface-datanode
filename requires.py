@@ -43,6 +43,9 @@ class DataNodeRequires(RelationBase):
         conv.set_state('{relation_name}.departing')
 
     def journalnodes_ready(self):
+        hookenv.log('JOURNALNODES_READY_FUNCTION:')
+        hookenv.log(str(self.started_journalnodes()))
+        hookenv.log(len(self.started_journalnodes()))
         if len(self.started_journalnodes()) > 2:
             return True 
 
