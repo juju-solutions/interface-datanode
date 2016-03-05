@@ -96,7 +96,7 @@ class DataNodeProvides(RelationBase):
         conv.toggle_state('{relation_name}.spec.mismatch', spec_mismatch)
         conv.toggle_state('{relation_name}.ready', ready and not spec_mismatch)
 
-        if data_changed('datanode.configuration', self.namenodes()) and len(self.namenodes()) > 1:
+        if conv.get_remote('queue.restart'):
             conv.set_state('datanode.restart.required')
 
         hookenv.log('States: {}'.format(set(get_states().keys())))

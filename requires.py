@@ -79,6 +79,10 @@ class DataNodeRequires(RelationBase):
         for conv in self.conversations():
             conv.set_remote('spec', json.dumps(spec))
 
+    def queue_restart(self):
+        for conv in self.conversations():
+            conv.set_remote('queue.restart', True)
+
     def send_clustername(self, clustername):
         for conv in self.conversations():
             conv.set_remote('clustername', clustername)
