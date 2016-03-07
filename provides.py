@@ -98,6 +98,7 @@ class DataNodeProvides(RelationBase):
 
         if conv.get_remote('queue.restart'):
             conv.set_state('datanode.restart.required')
+            # need to unset this once the state has been set
             conv.set_remote('queue.restart', False)
 
         hookenv.log('States: {}'.format(set(get_states().keys())))
