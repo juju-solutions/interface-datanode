@@ -42,7 +42,8 @@ class DataNodeRequires(RelationBase):
         return [
             {
                 'host': conv.scope.replace('/', '-'),
-                'ip': utils.resolve_private_address(conv.get_remote('private-address', '')),
+                'ip': utils.resolve_private_address(
+                    conv.get_remote('private-address', '')),
             }
             for conv in self.conversations()
         ]
