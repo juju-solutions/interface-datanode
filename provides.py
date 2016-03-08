@@ -86,11 +86,12 @@ class DataNodeProvides(RelationBase):
             self.port(),
             self.webhdfs_port(),
             self.ssh_key()])
-        spec_matches = self._spec_match()
+        spec_mismatch = available and not self._spec_match()
         visible = self.local_hostname() in self.hosts_map().values()
+        ready = available and visible
 
-        conv.toggle_state('{relation_name}.spec.mismatch', available and not spec_matches)
-        conv.toggle_state('{relation_name}.ready', available and spec_matches and visible)
+        conv.toggle_state('{relation_name}.spec.mismatch', spec_mismatch)
+        conv.toggle_state('{relation_name}.ready', ready and not spec_mismatch)
 
         hookenv.log('States: {}'.format(set(get_states().keys())))
 
