@@ -28,7 +28,7 @@ class DataNodeProvides(RelationBase):
         """
         Set the local spec.
 
-        Should be called after ``{relation_name}.related``.
+        Should be called after ``{relation_name}.joined``.
         """
         conv = self.conversation()
         conv.set_local('spec', json.dumps(spec))
@@ -65,7 +65,7 @@ class DataNodeProvides(RelationBase):
     @hook('{provides:dfs-slave}-relation-joined')
     def joined(self):
         conv = self.conversation()
-        conv.set_state('{relation_name}.related')
+        conv.set_state('{relation_name}.joined')
 
     @hook('{provides:dfs-slave}-relation-changed')
     def changed(self):
@@ -98,7 +98,7 @@ class DataNodeProvides(RelationBase):
     @hook('{provides:dfs-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
-        conv.remove_state('{relation_name}.related')
+        conv.remove_state('{relation_name}.joined')
         conv.remove_state('{relation_name}.spec.mismatch')
         conv.remove_state('{relation_name}.ready')
 
