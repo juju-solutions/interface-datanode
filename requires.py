@@ -33,19 +33,16 @@ class DataNodeRequires(RelationBase):
         if self.jn_port():
         #if len(self.started_journalnodes()) > 2:
             conv = self.conversation()
-            conv.set_state('{relation_name}.journalnode.ha')
+            conv.set_state('{relation_name}.journalnode.joined')
 
     @hook('{requires:dfs-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.joined')
-        conv.remove_state('{relation_name}.journalnode.ha')
+        conv.remove_state('{relation_name}.journalnode.joined')
         conv.set_state('{relation_name}.departing')
 
-    def journalnodes_ready(self):
-        hookenv.log('JOURNALNODES_READY_FUNCTION:')
-        hookenv.log(str(self.started_journalnodes()))
-        hookenv.log(len(self.started_journalnodes()))
+    def journalnodes_quorum(self):
         if len(self.started_journalnodes()) > 2:
             return True 
 
