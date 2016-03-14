@@ -108,9 +108,12 @@ class DataNodeProvides(RelationBase):
         conv.set_remote('jn_port', port)
 
     def node_started(self):
-        hookenv.log('Journalnode hit node_started')
         conv = self.conversation()
         conv.set_remote('journalnode-started', True)
+
+    def node_stopped(self):
+        conv = self.conversations()
+        conv.set_remote('journalnode-started', False)
 
     @hook('{provides:dfs-slave}-relation-departed')
     def departed(self):
