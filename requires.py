@@ -47,6 +47,7 @@ class DataNodeRequires(RelationBase):
             return True 
 
     def started_journalnodes(self):
+        # this below wont work if the value is anything other than True - fix/review
         return [conv.scope for conv in self.conversations() if conv.get_remote('journalnode-started')]
 
     def dismiss(self):
