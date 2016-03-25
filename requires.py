@@ -42,8 +42,8 @@ class DataNodeRequires(RelationBase):
         conv.remove_state('{relation_name}.journalnode.joined')
         conv.set_state('{relation_name}.departing')
 
-    def journalnodes_quorum(self):
-        if len(self.started_journalnodes()) > 2:
+    def journalnodes_quorum(self, size):
+        if len(self.started_journalnodes()) >= size:
             return True 
 
     def started_journalnodes(self):
