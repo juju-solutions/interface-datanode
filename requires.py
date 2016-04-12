@@ -15,7 +15,6 @@ import json
 from charms.reactive import RelationBase
 from charms.reactive import hook
 from charms.reactive import scopes
-from charmhelpers.core import hookenv
 from jujubigdata import utils
 
 
@@ -31,7 +30,6 @@ class DataNodeRequires(RelationBase):
     @hook('{requires:dfs-slave}-relation-changed')
     def changed(self):
         if self.jn_port():
-        #if len(self.started_journalnodes()) > 2:
             conv = self.conversation()
             conv.set_state('{relation_name}.journalnode.joined')
 
@@ -41,14 +39,6 @@ class DataNodeRequires(RelationBase):
         conv.remove_state('{relation_name}.joined')
         conv.remove_state('{relation_name}.journalnode.joined')
         conv.set_state('{relation_name}.departing')
-
-    def journalnodes_quorum(self, size):
-        if len(self.started_journalnodes()) >= size:
-            return True 
-
-    def started_journalnodes(self):
-        # this below wont work if the value is anything other than True - fix/review
-        return [conv.scope for conv in self.conversations() if conv.get_remote('journalnode-started')]
 
     def dismiss(self):
         for conv in self.conversations():
@@ -76,10 +66,6 @@ class DataNodeRequires(RelationBase):
     def send_spec(self, spec):
         for conv in self.conversations():
             conv.set_remote('spec', json.dumps(spec))
-
-    def queue_restart(self):
-        for conv in self.conversations():
-            conv.set_remote('queue.restart', True)
 
     def send_clustername(self, clustername):
         for conv in self.conversations():

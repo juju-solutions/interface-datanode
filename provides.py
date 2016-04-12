@@ -15,7 +15,6 @@ import json
 from charms.reactive import RelationBase
 from charms.reactive import hook
 from charms.reactive import scopes
-from charms.reactive.helpers import data_changed
 from charms.reactive.bus import get_states
 
 from charmhelpers.core import hookenv
@@ -96,18 +95,11 @@ class DataNodeProvides(RelationBase):
         conv.toggle_state('{relation_name}.spec.mismatch', spec_mismatch)
         conv.toggle_state('{relation_name}.ready', ready and not spec_mismatch)
 
-        if conv.get_remote('queue.restart'):
-            conv.set_state('datanode.restart.required')
-
         hookenv.log('States: {}'.format(set(get_states().keys())))
 
     def send_jn_port(self, port):
         conv = self.conversation()
         conv.set_remote('jn_port', port)
-
-    def node_started(self):
-        conv = self.conversation()
-        conv.set_remote('journalnode-started', True)
 
     @hook('{provides:dfs-slave}-relation-departed')
     def departed(self):
