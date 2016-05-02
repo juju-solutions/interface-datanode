@@ -32,6 +32,7 @@ class DataNodeProvides(RelationBase):
         """
         conv = self.conversation()
         conv.set_local('spec', json.dumps(spec))
+        self.changed()  # check for spec mismatch
 
     def local_hostname(self):
         return hookenv.local_unit().replace('/', '-')
